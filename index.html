@@ -61,13 +61,16 @@
 		var y = y_matches ? parseInt(y_matches[1]) : 0;
 
 		document.addEventListener("keyup", function(e) {
+			var direction = "stop"
+		
 			switch (e.key) {
-				case "ArrowUp": y--; break;
-				case "ArrowDown": y++; break;
-				case "ArrowLeft": x--; break;
-				case "ArrowRight": x++; break;
+				case "ArrowUp": direction = "up"; break;
+				case "ArrowDown": direction = "down"; break;
+				case "ArrowLeft": direction = "left"; break;
+				case "ArrowRight": direction = "right"; break;
 			}
-			location.href = "?x=" + x + "&y=" + y;
+
+			location.href = "/move/?direction=" + direction;
 		});
 
 		document.querySelectorAll(".control-button").forEach(function(button) {
