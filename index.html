@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+<title>Hello GO!</title>
+<style>
+	tr, td, table {
+		padding: 0;
+		border: 0;
+	}
+	td {
+		height: 30px;
+		width: 30px;
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	.control-button.pressed {
+		cursor: pointer;
+		font-weight: bold;
+	}
+
+	.control-button.pressed {
+		font-weight: bold;
+	}
+</style>
+</head>
+<body>
+	<h1>Hello GO!</h1>
+	<table>
+		{{range .View}}
+		<tr>
+			{{range .}}
+			<td>{{.}}</td>
+			{{end}}
+		</tr>
+		{{end}}
+	</table>
+
+	<table class="control-panel">
+		<tr>
+			<td></td>
+			<td class="control-button up">&DoubleUpArrow;</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td class="control-button left">&DoubleLeftArrow;</td>
+			<td></td>
+			<td class="control-button right">&DoubleRightArrow;</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td class="control-button down">&DoubleDownArrow;</td>
+			<td></td>
+		</tr>
+	</table>
+	<script>
+(function() {
+		var x_matches = location.search.match(/[?&]x=([^&$]+)/);
+		var y_matches = location.search.match(/[?&]y=([^&$]+)/);
+		var x = x_matches ? parseInt(x_matches[1]) : 0;
+		var y = y_matches ? parseInt(y_matches[1]) : 0;
+
+		document.addEventListener("keyup", function(e) {
+			switch (e.key) {
+				case "ArrowUp": y--; break;
+				case "ArrowDown": y++; break;
+				case "ArrowLeft": x--; break;
+				case "ArrowRight": x++; break;
+			}
+			location.href = "?x=" + x + "&y=" + y;
+		});
+
+		document.querySelectorAll(".control-button").forEach(function(button) {
+			button.addEventListener("click", function(e) {
+				location.href.search
+// 				var button = e.target;
+// 				console.log(button);
+
+// 				if (!confirm("Ходим?")) {
+// 					return false;
+// 				}
+
+				if (button.className.indexOf("up") != -1) {
+					y--;
+				} else if (button.className.indexOf("down") != -1) {
+					y++;
+				} else if (button.className.indexOf("left") != -1) {
+					x--;
+				} else if (button.className.indexOf("right") != -1) {
+					x++;
+				}
+
+				location.href = "?x=" + x + "&y=" + y;
+			});
+		});
+})();
+	</script>
+</body>
+</html>
