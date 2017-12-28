@@ -26,13 +26,13 @@ func NewHero() (Hero) {
 	return hero
 }
 
-func (hero Hero) Init() {
+func (hero *Hero) Init() {
 	hero.Alive = true
 	hero.X = 0
 	hero.Y = 0	
 }
 
-func (hero Hero) Symbol() (string) {
+func (hero *Hero) Symbol() (string) {
 	if hero.Alive {
 		return "&Omega;"
 
@@ -61,7 +61,7 @@ func handlerRoot(w http.ResponseWriter, r *http.Request) {
 // 	hero.X, _ = strconv.ParseInt(r.Form.Get("x"), 10, 64)
 // 	hero.Y, _ = strconv.ParseInt(r.Form.Get("y"), 10, 64)
 
-	executeTemplate(w, r, hero)
+	executeTemplate(w, r)
 }
 
 func handlerMove(w http.ResponseWriter, r *http.Request) {
@@ -84,19 +84,20 @@ func handlerMove(w http.ResponseWriter, r *http.Request) {
 		hero.Y++
 	}
 
-	executeTemplate(w, r, hero)
+	executeTemplate(w, r)
 }
 
-func executeTemplate(w http.ResponseWriter, r *http.Request, hero Hero) {
+func executeTemplate(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("was: hero.Alive", hero.Alive)
 	if !hero.Alive {
 		hero.Init();
-// 		fmt.Println("redirect to /", hero)
-// 		http.Redirect(w, r, "/", 302)
-// 		return
+		fmt.Println("redirect to /", hero)
+		http.Redirect(w, r, "/", 302)
+		return
 	}
 
-	placeHero(hero)
-	fmt.Println("hero.Alive", hero.Alive)
+	placeHero()
+	fmt.Println("now: hero.Alive", hero.Alive)
 	
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	t, err := template.ParseFiles("index.html")
@@ -124,7 +125,7 @@ func handlerError(w http.ResponseWriter, r *http.Request, status int) {
 	}
 }
 
-func placeHero(hero Hero) {
+func placeHero() {
 	for i := 0; i < viewSize; i++ {
 		view[i] = make([]string, len(viewLandscape[i]))
 		copy(view[i], viewLandscape[i]);
@@ -142,6 +143,7 @@ func placeHero(hero Hero) {
 	}
 
 	place := &view[y][x]
+	fmt.Println("place", *place)
 
 	if *place == water {
 		hero.Alive = false
@@ -167,6 +169,7 @@ func generateLandscape() ([][]string) {
 }
 
 func main() {
+	fmt.Println("at start: hero.Alive", hero.Alive)
 	viewLandscape = generateLandscape()
 	viewLandscape[0][0] = ground
 	view = make([][]string, len(viewLandscape))
