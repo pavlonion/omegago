@@ -100,8 +100,8 @@ func executeTemplate(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("now: hero.Alive", hero.Alive)
 	
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	t, err := template.ParseFiles("index.html")
-	
+	t, err := template.ParseFiles("web/index.html")
+
 	if err != nil {
 		handlerError(w, r, http.StatusInternalServerError)
 		return
