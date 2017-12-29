@@ -2,7 +2,7 @@ package linkedgrid
 
 type Side int
 const (
-	LeftSide = iota + 1
+	LeftSide Side = iota + 1
 	RightSide
 	UpSide
 	DownSide

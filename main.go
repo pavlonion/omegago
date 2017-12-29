@@ -6,18 +6,15 @@ import (
 // 	"strconv"
 	"log"
 	"text/template"
-	"math/rand"
-	"container/list"
+	"./world"
 )
 
-const viewSize = 16
-const water = "~"
-const ground = "."
+const viewSize = world.LandDimention
 
 type Hero struct {
+	world.Located
+	Land *world.Land
 	Alive bool
-	X int64
-	Y int64
 }
 
 func NewHero() (Hero) {
@@ -28,8 +25,8 @@ func NewHero() (Hero) {
 
 func (hero *Hero) Init() {
 	hero.Alive = true
-	hero.X = 0
-	hero.Y = 0	
+	hero.X = 4
+	hero.Y = 4
 }
 
 func (hero *Hero) Symbol() (string) {
@@ -42,13 +39,8 @@ func (hero *Hero) Symbol() (string) {
 }
 
 var hero = NewHero()
-
-var terrains = [2]string {"~", "."}
 var view [][]string
 var viewLandscape [][]string
-
-var world_latitude = list.New()
-var world_longitude = list.New()
 
 func handlerRoot(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -57,9 +49,6 @@ func handlerRoot(w http.ResponseWriter, r *http.Request) {
 		handlerError(w, r, http.StatusNotFound)
 		return
 	}
-
-// 	hero.X, _ = strconv.ParseInt(r.Form.Get("x"), 10, 64)
-// 	hero.Y, _ = strconv.ParseInt(r.Form.Get("y"), 10, 64)
 
 	executeTemplate(w, r)
 }
@@ -107,7 +96,7 @@ func executeTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	t.Execute(w, struct{View [][]string}{view})	
+	t.Execute(w, struct{View [][]string}{view})
 }
 
 
@@ -145,7 +134,7 @@ func placeHero() {
 	place := &view[y][x]
 	fmt.Println("place", *place)
 
-	if *place == water {
+	if *place == world.WaterTerrain.String() {
 		hero.Alive = false
 	} else {
 		hero.Alive = true
@@ -154,28 +143,14 @@ func placeHero() {
 	*place = hero.Symbol()
 }
 
-func generateLandscape() ([][]string) {
-	var landscape [][]string
-
-	for i := 0; i < viewSize; i++ {
-		landscape = append(landscape, []string{})
-		
-		for j := 0; j < viewSize; j++ {
-			landscape[i] = append(landscape[i], terrains[rand.Intn(len(terrains))])
-		}
-	}
-	
-	return landscape
-}
-
 func main() {
 	fmt.Println("at start: hero.Alive", hero.Alive)
-	viewLandscape = generateLandscape()
-	viewLandscape[0][0] = ground
-	view = make([][]string, len(viewLandscape))
 
-	world_latitude.PushBack(viewLandscape)
-	world_longitude.PushBack(viewLandscape)
+	land := world.GetLand(112, 412)
+	land.Update(4, 4, world.GroundTerrain)
+
+	viewLandscape = land.View()
+	view = make([][]string, world.LandDimention)
 
 	http.HandleFunc("/", handlerRoot)
 	http.HandleFunc("/move/", handlerMove)
