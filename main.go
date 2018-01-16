@@ -9,7 +9,7 @@ import (
 	"./world"
 )
 
-const viewSize = world.LandDimention
+const viewSize = 16
 
 type Hero struct {
 	world.Located
@@ -25,8 +25,8 @@ func NewHero() (Hero) {
 
 func (hero *Hero) Init() {
 	hero.Alive = true
-	hero.X = 4
-	hero.Y = 4
+	hero.X = 8
+	hero.Y = 8
 }
 
 func (hero *Hero) Symbol() (string) {
@@ -116,7 +116,7 @@ func handlerError(w http.ResponseWriter, r *http.Request, status int) {
 
 func placeHero() {
 	for i := 0; i < viewSize; i++ {
-		view[i] = make([]string, len(viewLandscape[i]))
+		view[i] = make([]string, viewSize)
 		copy(view[i], viewLandscape[i]);
 	}
 
@@ -147,10 +147,17 @@ func main() {
 	fmt.Println("at start: hero.Alive", hero.Alive)
 
 	land := world.GetLand(112, 412)
-	land.Update(4, 4, world.GroundTerrain)
 
-	viewLandscape = land.View()
-	view = make([][]string, world.LandDimention)
+	for _, i := range []int{-1, 0, 1} {
+		for _, j := range []int{-1, 0, 1} {
+			println(i, j)
+			land.Update(hero.X + i, hero.Y + j, world.GroundTerrain)
+		}
+	}
+
+	viewLandscape = world.GetView(112, 412, viewSize)
+
+	view = make([][]string, viewSize)
 
 	http.HandleFunc("/", handlerRoot)
 	http.HandleFunc("/move/", handlerMove)

@@ -1,6 +1,7 @@
 package world
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -33,9 +34,23 @@ const (
 
 type View [][]string
 
+func (view View) String() string {
+	var result string;
+	
+	for _, row := range view {
+		for _, cell := range row {
+			result += cell + " "
+		}
+
+		result += "\n"
+	}
+
+	return result
+}
+
 type Land struct {
 	Located
-	tiles [][]string
+	tiles View
 }
 
 func NewLand() *Land {
@@ -117,9 +132,32 @@ func GetLand(x, y int) *Land {
 	return lands.X(x).Y(y)
 }
 
-// func GetView(x, y, dimetion int) View {
-// 	landCount := dimention /
-// }
+func GetView(x, y, dimention int) View {	
+	if dimention < LandDimention {
+		panic(fmt.Sprintf("dimention param should be greater then LandDimention = %d", LandDimention))
+	}
+
+	quotient := int(dimention / LandDimention)
+	even := int(quotient - (quotient % 2)) + 2
+	middle := int(even / 2)
+	land_count := even + 1
+	result := make(View, land_count * LandDimention)
+	vYShift := 0
+
+	for i := -middle; i <= middle; i++ {
+		for j := -middle; j <= middle; j++ {
+			view := GetLand(x + i, y + j).View()
+
+			for vY := 0; vY < LandDimention; vY++ {
+				result[vYShift + vY] = append(result[vYShift + vY], view[vY]...)
+			}
+		}
+
+		vYShift = vYShift + LandDimention
+	}
+
+	return result;
+}
 
 func init() {
 	lands = NewLandGrid()

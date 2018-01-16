@@ -22,3 +22,9 @@ func TestLand(t *testing.T) {
 	println(lg.X(0).Y(12))
 	println(lg.X(0).Y(12))
 }
+
+func TestGetView(t *testing.T) {
+	println(GetView(10, 10, 12).String());
+	println(GetLand(10, 10).View().String());
+	println(GetView(10, 10, 9).String());
+}
