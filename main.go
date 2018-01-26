@@ -151,7 +151,7 @@ func main() {
 	for _, i := range []int{-1, 0, 1} {
 		for _, j := range []int{-1, 0, 1} {
 			println(i, j)
-			land.Update(hero.X + i, hero.Y + j, world.GroundTerrain)
+			land.Update(hero.X + i, hero.Y + j, world.MountainTerrain)
 		}
 	}
 

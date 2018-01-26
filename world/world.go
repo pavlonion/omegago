@@ -2,6 +2,7 @@ package world
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"time"
 )
@@ -29,14 +30,14 @@ type Located struct {
 }
 
 const (
-	LandDimention = 9
+	LandDimention = 8
 )
 
 type View [][]string
 
 func (view View) String() string {
 	var result string;
-	
+
 	for _, row := range view {
 		for _, cell := range row {
 			result += cell + " "
@@ -76,51 +77,51 @@ func (land *Land) View() View {
 }
 
 func (land *Land) Update(x, y int, terrain TerrainType) {
-	land.tiles[x % LandDimention][y % LandDimention] = terrain.String()
+	land.tiles[y % LandDimention][x % LandDimention] = terrain.String()
 }
 
 /*
  * World
  */
-type LandColumn struct {
+type LandRow struct {
 	storage map[int]*Land
 }
 
-func NewLandColumn() *LandColumn {
-	column := new(LandColumn)
+func NewLandRow() *LandRow {
+	column := new(LandRow)
 	column.storage = make(map[int]*Land)
 	return column
 }
 
-func (column *LandColumn) Y(y int) *Land {
+func (column *LandRow) X(x int) *Land {
 	var land *Land
 	ok := false
 
-	if land, ok = column.storage[y]; !ok {
-		column.storage[y] = NewLand()
-		land = column.storage[y]
+	if land, ok = column.storage[x]; !ok {
+		column.storage[x] = NewLand()
+		land = column.storage[x]
 	}
 
 	return land
 }
 
 type LandGrid struct {
-	storage map[int]*LandColumn
+	storage map[int]*LandRow
 }
 
 func NewLandGrid() *LandGrid {
 	column := new(LandGrid)
-	column.storage = make(map[int]*LandColumn)
+	column.storage = make(map[int]*LandRow)
 	return column
 }
 
-func (grid *LandGrid) X(x int) *LandColumn {
-	var column *LandColumn
+func (grid *LandGrid) Y(y int) *LandRow {
+	var column *LandRow
 	ok := false
 
-	if column, ok = grid.storage[x]; !ok {
-		grid.storage[x] = NewLandColumn()
-		column = grid.storage[x]
+	if column, ok = grid.storage[y]; !ok {
+		grid.storage[y] = NewLandRow()
+		column = grid.storage[y]
 	}
 
 	return column
@@ -129,31 +130,54 @@ func (grid *LandGrid) X(x int) *LandColumn {
 var lands *LandGrid
 
 func GetLand(x, y int) *Land {
-	return lands.X(x).Y(y)
+	return lands.Y(y).X(x)
 }
 
-func GetView(x, y, dimention int) View {	
+func ceilDiv(a, b int) int {
+	return int(math.Ceil(float64(a) / float64(b)))
+}
+
+func floorDiv(a, b int) int {
+	return int(math.Floor(float64(a) / float64(b)))
+}
+
+func GetView(landX, landY, dimention int) View {
 	if dimention < LandDimention {
 		panic(fmt.Sprintf("dimention param should be greater then LandDimention = %d", LandDimention))
 	}
 
-	quotient := int(dimention / LandDimention)
-	even := int(quotient - (quotient % 2)) + 2
-	middle := int(even / 2)
-	land_count := even + 1
-	result := make(View, land_count * LandDimention)
-	vYShift := 0
+	landCount := ceilDiv(dimention, LandDimention)
 
-	for i := -middle; i <= middle; i++ {
-		for j := -middle; j <= middle; j++ {
-			view := GetLand(x + i, y + j).View()
+	totalDimention := landCount * LandDimention
+	if totalDimention - dimention < 2 {
+		landCount += 1
+		totalDimention = landCount * LandDimention
+	}
 
-			for vY := 0; vY < LandDimention; vY++ {
-				result[vYShift + vY] = append(result[vYShift + vY], view[vY]...)
+	middle := floorDiv(landCount, 2)
+	totalCenter := floorDiv(totalDimention, 2)
+	viewStart := totalCenter - ceilDiv(dimention, 2)
+	viewEnd := totalCenter + ceilDiv(dimention, 2)
+
+	result := make(View, dimention)
+
+	for landShiftY := 0; landShiftY < landCount; landShiftY++ {
+		for landShiftX := 0; landShiftX < landCount; landShiftX++ {
+			view := GetLand(landX + landShiftY - middle, landY + landShiftX - middle).View()
+
+			for y := 0; y < LandDimention; y++ {
+				totalY := landShiftY * LandDimention + y
+
+				for x := 0; x < LandDimention; x++ {
+					totalX := landShiftX * LandDimention + x
+
+					if totalX >= viewStart && totalX < viewEnd && totalY >= viewStart && totalY < viewEnd {
+						resultY := totalY - viewStart
+						result[resultY] = append(result[resultY], view[y][x])
+					}
+				}
 			}
 		}
-
-		vYShift = vYShift + LandDimention
 	}
 
 	return result;

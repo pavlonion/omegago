@@ -14,17 +14,17 @@ func TestTerrainType(t *testing.T) {
 }
 
 func TestLand(t *testing.T) {
-	lc := NewLandColumn()
-	println(lc.Y(0))
+	lc := NewLandRow()
+	println(lc.X(0))
 
 	lg := NewLandGrid()
-	println(lg.X(0))
-	println(lg.X(0).Y(12))
-	println(lg.X(0).Y(12))
+	println(lg.Y(0))
+	println(lg.Y(0).X(12))
+	println(lg.Y(0).X(12))
 }
 
 func TestGetView(t *testing.T) {
-	println(GetView(10, 10, 12).String());
+	println(GetView(10, 10, 16).String());
 	println(GetLand(10, 10).View().String());
-	println(GetView(10, 10, 9).String());
+	println(GetView(10, 10, LandDimention).String());
 }
