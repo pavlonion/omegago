@@ -25,8 +25,8 @@ func NewHero() (Hero) {
 
 func (hero *Hero) Init() {
 	hero.Alive = true
-	hero.X = 8
-	hero.Y = 8
+	hero.X = 6
+	hero.Y = 6
 }
 
 func (hero *Hero) Symbol() (string) {
@@ -147,11 +147,12 @@ func main() {
 	fmt.Println("at start: hero.Alive", hero.Alive)
 
 	land := world.GetLand(112, 412)
+	r := []int{0, 1, 2, 3, 4}
 
-	for _, i := range []int{-1, 0, 1} {
-		for _, j := range []int{-1, 0, 1} {
+	for _, i := range r {
+		for _, j := range r {
 			println(i, j)
-			land.Update(hero.X + i, hero.Y + j, world.MountainTerrain)
+			land.Update(i, j, world.GroundTerrain)
 		}
 	}
 
