@@ -24,7 +24,7 @@ func TestLand(t *testing.T) {
 }
 
 func TestGetView(t *testing.T) {
-	println(GetView(10, 10, 16).String());
+	println(GetScreen(10, 10, 16).String());
 	println(GetLand(10, 10).View().String());
-	println(GetView(10, 10, LandDimention).String());
+	println(GetScreen(10, 10, LandDimention).String());
 }

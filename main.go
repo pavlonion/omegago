@@ -40,7 +40,8 @@ func (hero *Hero) Symbol() (string) {
 
 var hero = NewHero()
 var view [][]string
-var viewLandscape [][]string
+var screen [][]string
+
 
 func handlerRoot(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -115,9 +116,11 @@ func handlerError(w http.ResponseWriter, r *http.Request, status int) {
 }
 
 func placeHero() {
+	screen = world.GetScreen(hero.Land.X, hero.Land.Y, viewSize)
+
 	for i := 0; i < viewSize; i++ {
 		view[i] = make([]string, viewSize)
-		copy(view[i], viewLandscape[i]);
+		copy(view[i], screen[i]);
 	}
 
 	x := hero.X % viewSize
@@ -144,21 +147,17 @@ func placeHero() {
 }
 
 func main() {
+	view = make([][]string, viewSize)
 	fmt.Println("at start: hero.Alive", hero.Alive)
 
-	land := world.GetLand(112, 412)
+	hero.Land = world.GetLand(0, 0)
 	r := []int{0, 1, 2, 3, 4}
 
 	for _, i := range r {
 		for _, j := range r {
-			println(i, j)
-			land.Update(i, j, world.GroundTerrain)
+			hero.Land.Update(i, j, world.GroundTerrain)
 		}
 	}
-
-	viewLandscape = world.GetView(112, 412, viewSize)
-
-	view = make([][]string, viewSize)
 
 	http.HandleFunc("/", handlerRoot)
 	http.HandleFunc("/move/", handlerMove)

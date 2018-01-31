@@ -141,7 +141,7 @@ func floorDiv(a, b int) int {
 	return int(math.Floor(float64(a) / float64(b)))
 }
 
-func GetView(landX, landY, dimention int) View {
+func GetScreen(landX, landY, dimention int) View {
 	if dimention < LandDimention {
 		panic(fmt.Sprintf("dimention param should be greater then LandDimention = %d", LandDimention))
 	}
